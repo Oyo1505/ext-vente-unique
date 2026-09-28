@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "Support IT - Onboarding",
+  "version": "0.1.0",
+  "description": "Prepare an onboarding email for a new employee without storing passwords.",
+  "permissions": [
+    "storage",
+    "tabs",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://mail.google.com/*"
+  ],
+  "action": {
+    "default_title": "Préparer l'arrivée",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://mail.google.com/*"],
+      "js": ["config.js", "content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

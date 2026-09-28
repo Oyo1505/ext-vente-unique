@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Nouvelle arrivée</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="panel">
+      <header class="header">
+        <div>
+          <p class="eyebrow">SUPPORT IT</p>
+          <h1>Préparer une arrivée</h1>
+        </div>
+        <button class="clear-button" id="clear-form" type="button" title="Effacer l'identité et régénérer les mots de passe">Effacer</button>
+      </header>
+
+      <form id="onboarding-form">
+        <button class="secondary-button" id="retrieve-page-info" type="button">
+          Récupérer les infos de la page <span>↓</span>
+        </button>
+
+        <section class="section">
+          <h2>Identité</h2>
+          <div class="field-grid">
+            <label>
+              Prénom
+              <input id="first-name" name="firstName" autocomplete="given-name" required>
+            </label>
+            <label>
+              Nom
+              <input id="last-name" name="lastName" autocomplete="family-name" required>
+            </label>
+          </div>
+          <label>
+            Identifiant
+            <input id="login" name="login" spellcheck="false" required>
+            <span class="hint">Initiale du prénom + nom, sans accents</span>
+          </label>
+          <label>
+            Compte modèle
+            <input id="model-account" name="modelAccount" type="text" placeholder="Prénom Nom">
+            <span class="hint">Compte à reproduire pour les groupes emails et les droits BO</span>
+          </label>
+        </section>
+
+        <section class="section">
+          <div class="section-heading">
+            <h2>Destinataires</h2>
+            <span class="tag">mémorisés</span>
+          </div>
+          <label>
+            Adresses email
+            <input id="recipients" name="recipients" type="email" multiple placeholder="support@exemple.com, manager@exemple.com">
+            <span class="hint">Séparez plusieurs adresses par une virgule</span>
+          </label>
+        </section>
+
+        <section class="section credentials">
+          <div class="section-heading">
+            <h2>Mots de passe</h2>
+            <span class="tag">jamais enregistrés sur disque</span>
+          </div>
+          <div class="credential-row">
+            <label>
+              Windows
+              <input id="windows-password" readonly>
+            </label>
+            <button class="icon-button" type="button" data-copy="windows-password" title="Copier le mot de passe Windows" aria-label="Copier le mot de passe Windows">⧉</button>
+            <button class="icon-button" type="button" data-regenerate="windows-password" title="Régénérer le mot de passe Windows" aria-label="Régénérer le mot de passe Windows">↻</button>
+          </div>
+          <div class="credential-row">
+            <label>
+              Google
+              <input id="google-password" readonly>
+            </label>
+            <button class="icon-button" type="button" data-copy="google-password" title="Copier le mot de passe Google" aria-label="Copier le mot de passe Google">⧉</button>
+            <button class="icon-button" type="button" data-regenerate="google-password" title="Régénérer le mot de passe Google" aria-label="Régénérer le mot de passe Google">↻</button>
+          </div>
+        </section>
+
+        <p id="status" class="status" role="status" aria-live="polite"></p>
+        <button class="secondary-button" id="fill-google-form" type="button">
+          Remplir le formulaire (Google / BO) <span>↑</span>
+        </button>
+        <button class="primary-button" type="submit">Ouvrir la rédaction Gmail <span>↗</span></button>
+      </form>
+    </main>
+    <script src="config.js"></script>
+    <script src="arrival-draft.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>
