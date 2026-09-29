@@ -175,3 +175,11 @@ test("terminer mémorise les destinataires, oublie le brouillon et renvoie le ma
   assert.deepEqual(storage.store.recipients, ["rh@exemple.com", "manager@exemple.com"]);
   assert.equal(storage.store.draft, undefined);
 });
+
+test("la date d'arrivée de la page est reprise, et oubliée pour une nouvelle personne sans date", async () => {
+  const { draft } = await newDraft();
+  const page = { firstName: "Jean", lastName: "Dupont", modelAccount: "", recipientEmails: [] };
+  assert.equal(draft.applyPageInfo({ ...page, arrivalDate: "2026-09-14" }).arrivalDate, "2026-09-14");
+  assert.equal(draft.applyPageInfo(page).arrivalDate, "2026-09-14");
+  assert.equal(draft.applyPageInfo({ ...page, firstName: "Paul" }).arrivalDate, "");
+});

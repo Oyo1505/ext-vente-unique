@@ -11,6 +11,8 @@ function createArrivalDraft({ config, storage, randomIndex = cryptoRandomIndex }
       login: "",
       loginEdited: false,
       modelAccount: "",
+      // Date d'arrivée au format ISO (AAAA-MM-JJ), vide si inconnue
+      arrivalDate: "",
       recipients: "",
       windowsPassword: generatePassword(),
       googlePassword: generatePassword()
@@ -83,7 +85,7 @@ function createArrivalDraft({ config, storage, randomIndex = cryptoRandomIndex }
       return snapshot();
     },
 
-    // field : firstName | lastName | modelAccount | recipients
+    // field : firstName | lastName | modelAccount | arrivalDate | recipients
     setField(field, value) {
       return update({ [field]: value });
     },
@@ -92,12 +94,14 @@ function createArrivalDraft({ config, storage, randomIndex = cryptoRandomIndex }
       return update({ login, loginEdited: true });
     },
 
-    applyPageInfo({ firstName, lastName, modelAccount, recipientEmails }) {
+    applyPageInfo({ firstName, lastName, modelAccount, arrivalDate = "", recipientEmails }) {
       const isNewPerson = firstName !== state.firstName || lastName !== state.lastName;
       return update({
         firstName,
         lastName,
         modelAccount,
+        // Une nouvelle personne sans date sur la page n'hérite pas de celle de l'arrivée précédente
+        arrivalDate: arrivalDate || (isNewPerson ? "" : state.arrivalDate),
         loginEdited: false,
         ...(recipientEmails.length && { recipients: recipientEmails.join(", ") }),
         ...(isNewPerson && { windowsPassword: generatePassword(), googlePassword: generatePassword() })

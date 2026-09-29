@@ -8,6 +8,7 @@ const firstNameInput = document.querySelector("#first-name");
 const lastNameInput = document.querySelector("#last-name");
 const loginInput = document.querySelector("#login");
 const modelAccountInput = document.querySelector("#model-account");
+const arrivalDateInput = document.querySelector("#arrival-date");
 const recipientsInput = document.querySelector("#recipients");
 
 // Brouillon en mémoire (storage.session, jamais écrit sur disque) pour survivre à la fermeture du popup ;
@@ -28,6 +29,7 @@ const fieldInputs = {
   lastName: lastNameInput,
   login: loginInput,
   modelAccount: modelAccountInput,
+  arrivalDate: arrivalDateInput,
   recipients: recipientsInput,
   windowsPassword: document.querySelector("#windows-password"),
   googlePassword: document.querySelector("#google-password")
@@ -111,7 +113,7 @@ async function fillAdminForm({ firstName, lastName, login, password }) {
   return { filled, missing };
 }
 
-function fillBoForm({ firstName, lastName, login, email, password }) {
+function fillBoForm({ firstName, lastName, login, email, password, arrivalDate }) {
   const filled = [];
   const missing = [];
   const fill = (name, id, value) => {
@@ -131,6 +133,28 @@ function fillBoForm({ firstName, lastName, login, email, password }) {
   fill("Prénom", "bo_user_firstname", firstName);
   fill("Nom", "bo_user_lastname", lastName);
   fill("Mot de passe", "bo_user_plainPassword", password);
+
+  // Datepicker Tempus Dominus : écrire la date dans le format et la langue qu'il attend (ex. « 14 sept. 2026 »),
+  // il la relit sur l'événement change
+  if (arrivalDate && document.getElementById("bo_user_arrivalDate")) {
+    const [year, month, day] = arrivalDate.split("-").map(Number);
+    const date = new Date(year, month - 1, day);
+    let localization = {};
+    try {
+      localization = JSON.parse(document.getElementById("bo_user_arrivalDate_controller")?.dataset.datepickerOptionsValue ?? "{}").localization ?? {};
+    } catch {}
+    const { locale = "fr", format = "d MMM yyyy" } = localization;
+    const pad = value => String(value).padStart(2, "0");
+    const monthName = style => new Intl.DateTimeFormat(locale, { month: style }).format(date);
+    const tokens = {
+      yyyy: year, yy: pad(year % 100),
+      MMMM: monthName("long"), MMM: monthName("short"), MM: pad(month), M: month,
+      dd: pad(day), d: day
+    };
+    fill("Date d'arrivée", "bo_user_arrivalDate", format.replace(/yyyy|yy|MMMM|MMM|MM|M|dd|d/g, token => tokens[token]));
+  } else {
+    missing.push("Date d'arrivée");
+  }
 
   // Case iCheck : la cocher via son calque cliquable pour garder l'affichage synchronisé
   const valid = document.getElementById("bo_user_valid");
@@ -181,6 +205,21 @@ function extractPageInfo() {
     : lines.slice(recipientLabelIndex + 1, recipientLabelIndex + 3).join(" ").match(emailPattern)?.[0]
       ? [lines.slice(recipientLabelIndex + 1, recipientLabelIndex + 3).join(" ").match(emailPattern)[0].toLowerCase()]
       : [];
+  // Question date Google Forms : trois champs JJ / MM / AAAA (entry.XXX_day, _month, _year)
+  const arrivalDate = (() => {
+    const heading = [...document.querySelectorAll('[role="heading"]')]
+      .find(element => /^date d.arriv[ée]e$/i.test(cleanLabel(element.innerText)));
+    const item = heading?.closest('[role="listitem"], [data-item-id]');
+    if (!item) return "";
+    const nativeDate = item.querySelector('input[type="date"]')?.value;
+    if (nativeDate) return nativeDate;
+    const part = suffix => item.querySelector(`input[name$="_${suffix}"]`)?.value.trim() ?? "";
+    let [day, month, year] = [part("day"), part("month"), part("year")];
+    if (!(day && month && year)) {
+      [, day, month, year] = item.innerText.match(/(\d{1,2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{4})/) ?? [];
+    }
+    return day && month && year ? `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}` : "";
+  })();
   let lastName = answerFor(/^nom$/i);
   let firstName = answerFor(/^pr[ée]nom$/i);
 
@@ -200,7 +239,7 @@ function extractPageInfo() {
 
   if (!lastName || !firstName) return null;
 
-  return { lastName, firstName, modelAccount, recipientEmails };
+  return { lastName, firstName, modelAccount, arrivalDate, recipientEmails };
 }
 
 retrievePageInfoButton.addEventListener("click", async () => {
@@ -230,7 +269,7 @@ retrievePageInfoButton.addEventListener("click", async () => {
   }
 });
 
-["firstName", "lastName", "modelAccount", "recipients"].forEach(field => {
+["firstName", "lastName", "modelAccount", "arrivalDate", "recipients"].forEach(field => {
   fieldInputs[field].addEventListener("input", event => render(draft.setField(field, event.target.value)));
 });
 loginInput.addEventListener("input", () => render(draft.editLogin(loginInput.value)));
@@ -253,7 +292,12 @@ fillGoogleFormButton.addEventListener("click", async () => {
     } else if (tab?.url?.startsWith("https://bo.vente-unique.com/")) {
       injection = {
         func: fillBoForm,
-        args: [{ ...identity, email: `${identity.login}@${config.domains.google}`, password: config.bo.password }]
+        args: [{
+          ...identity,
+          email: `${identity.login}@${config.domains.google}`,
+          password: config.bo.password,
+          arrivalDate: draft.snapshot().arrivalDate
+        }]
       };
     } else {
       showStatus("Ouvrez le formulaire de création Google Admin ou BO.", true);

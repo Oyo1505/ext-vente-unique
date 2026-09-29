@@ -11,7 +11,10 @@ L'embauche d'une personne, traitée de bout en bout par le Support IT : lecture 
 L'arrivée en cours de préparation dans le popup : identité, identifiant, compte modèle, destinataires et mots de passe. Il est conservé en mémoire (`storage.session`) pour survivre à la fermeture du popup et oublié quand l'arrivée est terminée. Module : `arrival-draft.js`.
 
 **Demande d'arrivée**
-La page (formulaire Google) qui annonce l'arrivée. Le bouton « Récupérer les infos de la page » y lit le nom, le prénom, le compte modèle et l'adresse email à prévenir.
+La page (formulaire Google) qui annonce l'arrivée. Le bouton « Récupérer les infos de la page » y lit le nom, le prénom, le compte modèle, la date d'arrivée et l'adresse email à prévenir.
+
+**Date d'arrivée**
+Le premier jour de la personne, lu dans la question « date d'arrivée » de la demande. Elle est reportée dans le champ date du compte BO. Une nouvelle personne sans date sur la page n'hérite pas de celle de l'arrivée précédente.
 
 **Identifiant**
 La partie commune des adresses de la personne : initiale du prénom + séparateur + nom, sans accents ni caractères spéciaux (ex. `jdupont`). Il est recalculé à chaque changement du nom, sauf s'il a été **modifié à la main**. Récupérer les infos de la page annule la modification manuelle.
