@@ -32,7 +32,7 @@ Le compte existant dont on reproduit les groupes emails et les droits BO (« rep
 Les adresses qui reçoivent le mail d'arrivée (manager, RH…). Ils sont **mémorisés** sur disque (`storage.local`) d'une arrivée à l'autre, et effacés par le bouton « Effacer ».
 
 **BO (Back Office)**
-L'outil interne `bo.vente-unique.com`. Ses comptes sont créés avec un mot de passe initial fixe (`config.bo.password`), pas celui généré.
+Les outils internes `bo.vente-unique.com` et `bo.habitat.fr` (liste dans `config.bo.urls`). Leurs comptes sont créés avec un mot de passe initial fixe (`config.bo.password`), pas celui généré.
 
 **Google Admin**
 La console `admin.google.com` où l'on crée le compte Google.

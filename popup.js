@@ -289,7 +289,7 @@ fillGoogleFormButton.addEventListener("click", async () => {
     let injection;
     if (tab?.url?.startsWith("https://admin.google.com/")) {
       injection = { func: fillAdminForm, args: [{ ...identity, password: draft.snapshot().googlePassword }] };
-    } else if (tab?.url?.startsWith("https://bo.vente-unique.com/")) {
+    } else if (config.bo.urls.some(url => tab?.url?.startsWith(url))) {
       injection = {
         func: fillBoForm,
         args: [{
