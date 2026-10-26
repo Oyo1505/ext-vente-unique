@@ -2,6 +2,10 @@
 // storage : { loadDraft, saveDraft, removeDraft, loadRecipients, saveRecipients }
 function createArrivalDraft({ config, storage, randomIndex = cryptoRandomIndex }) {
   const SYMBOLS = "!@#$%&*-_=+?";
+  // Sans I, O, l, 0 ni 1, trop faciles à confondre
+  const UPPERCASE = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+  const LOWERCASE = "abcdefghijkmnopqrstuvwxyz";
+  const DIGITS = "23456789";
   let state = emptyState();
 
   function emptyState() {
@@ -33,20 +37,13 @@ function createArrivalDraft({ config, storage, randomIndex = cryptoRandomIndex }
     return firstName && lastName ? `${firstName[0]}${config.login.separator}${lastName}` : "";
   }
 
+  // Majuscule, minuscules puis chiffres (ex. Kmprtxzq4827) : pas d'alternance de casse à la saisie
   function generatePassword() {
-    const { length, requiredSets, symbols } = config.password;
-    const sets = symbols ? [...requiredSets, SYMBOLS] : requiredSets;
-    const characters = sets.map(randomCharacter);
-    const alphabet = sets.join("");
-
-    while (characters.length < length) characters.push(randomCharacter(alphabet));
-
-    for (let index = characters.length - 1; index > 0; index -= 1) {
-      const swapIndex = randomIndex(index + 1);
-      [characters[index], characters[swapIndex]] = [characters[swapIndex], characters[index]];
-    }
-
-    return characters.join("");
+    const { letters, digits, symbols } = config.password;
+    let password = randomCharacter(UPPERCASE);
+    for (let index = 1; index < letters; index += 1) password += randomCharacter(LOWERCASE);
+    for (let index = 0; index < digits; index += 1) password += randomCharacter(DIGITS);
+    return password + (symbols ? randomCharacter(SYMBOLS) : "");
   }
 
   function randomCharacter(alphabet) {

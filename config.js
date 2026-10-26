@@ -27,12 +27,10 @@ globalThis.ONBOARDING_CONFIG = {
     password: "azerty"
   },
   password: {
-    length: 12,
-    symbols: false,
-    requiredSets: [
-      "ABCDEFGHJKLMNPQRSTUVWXYZ",
-      "abcdefghijkmnopqrstuvwxyz",
-      "23456789"
-    ]
+    // Format : une majuscule, des minuscules puis des chiffres, ex. Kmprtxzq4827
+    letters: 8,
+    digits: 4,
+    // Ajoute un symbole à la fin si un service l'exige
+    symbols: false
   }
 };

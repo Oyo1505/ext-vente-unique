@@ -4,6 +4,7 @@ require("../config.js");
 const { createArrivalDraft } = require("../arrival-draft.js");
 
 const baseConfig = globalThis.ONBOARDING_CONFIG;
+const PASSWORD_LENGTH = baseConfig.password.letters + baseConfig.password.digits;
 
 function memoryStorage({ draft, recipients } = {}) {
   const store = { draft, recipients };
@@ -88,15 +89,17 @@ test("les destinataires de la page remplacent ceux saisis, sauf s'il n'y en a pa
   assert.equal(draft.applyPageInfo({ ...page, recipientEmails: ["rh@exemple.com"] }).recipients, "rh@exemple.com");
 });
 
-test("les mots de passe respectent la longueur et chaque jeu requis", async () => {
-  const { draft } = await newDraft({ config: withConfig({ password: { symbols: true } }) });
+test("les mots de passe suivent le format majuscule, minuscules puis chiffres", async () => {
+  const { draft } = await newDraft();
   for (let run = 0; run < 50; run += 1) {
     const password = draft.regenerate("windows").windowsPassword;
-    assert.equal(password.length, baseConfig.password.length);
-    for (const set of [...baseConfig.password.requiredSets, "!@#$%&*-_=+?"]) {
-      assert.ok([...password].some(character => set.includes(character)), `${password} sans ${set}`);
-    }
+    assert.match(password, /^[A-HJ-NP-Z][a-km-z]{7}[2-9]{4}$/);
   }
+});
+
+test("l'option symbols ajoute un symbole final", async () => {
+  const { draft } = await newDraft({ config: withConfig({ password: { symbols: true } }) });
+  assert.match(draft.regenerate("windows").windowsPassword, /^[A-Za-z]{8}\d{4}[!@#$%&*\-_=+?]$/);
 });
 
 test("chaque modification est enregistrée dans le brouillon, destinataires compris", async () => {
@@ -119,13 +122,13 @@ test("sans brouillon, les destinataires mémorisés sont repris et les mots de p
   const { draft } = await newDraft({ storage: memoryStorage({ recipients: ["a@exemple.com", "b@exemple.com"] }) });
   const snapshot = draft.snapshot();
   assert.equal(snapshot.recipients, "a@exemple.com, b@exemple.com");
-  assert.equal(snapshot.windowsPassword.length, baseConfig.password.length);
-  assert.equal(snapshot.googlePassword.length, baseConfig.password.length);
+  assert.equal(snapshot.windowsPassword.length, PASSWORD_LENGTH);
+  assert.equal(snapshot.googlePassword.length, PASSWORD_LENGTH);
 });
 
 test("un ancien brouillon sans mot de passe en reçoit un", async () => {
   const { draft } = await newDraft({ storage: memoryStorage({ draft: { firstName: "Jean", windowsPassword: "" } }) });
-  assert.equal(draft.snapshot().windowsPassword.length, baseConfig.password.length);
+  assert.equal(draft.snapshot().windowsPassword.length, PASSWORD_LENGTH);
   assert.equal(draft.snapshot().firstName, "Jean");
 });
 
