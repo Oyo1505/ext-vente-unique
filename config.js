@@ -21,16 +21,16 @@ globalThis.ONBOARDING_CONFIG = {
     "- Google : {googleLogin} // {googlePassword}"
   ].join("\n"),
   bo: {
+    // Back Offices dont le formulaire de création de compte est rempli par l'extension
+    urls: ["https://bo.vente-unique.com/", "https://bo.habitat.fr/"],
     // Mot de passe initial des comptes Back Office
     password: "azerty"
   },
   password: {
-    length: 12,
-    symbols: false,
-    requiredSets: [
-      "ABCDEFGHJKLMNPQRSTUVWXYZ",
-      "abcdefghijkmnopqrstuvwxyz",
-      "23456789"
-    ]
+    // Format : une majuscule, des minuscules puis des chiffres, ex. Kmprtxzq4827
+    letters: 8,
+    digits: 4,
+    // Ajoute un symbole à la fin si un service l'exige
+    symbols: false
   }
 };

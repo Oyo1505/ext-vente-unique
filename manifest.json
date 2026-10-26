@@ -24,6 +24,11 @@
       "matches": ["https://mail.google.com/*"],
       "js": ["config.js", "content.js"],
       "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://vente-unique.ilucca.net/*"],
+      "js": ["task-filter.js"],
+      "run_at": "document_idle"
     }
   ]
 }

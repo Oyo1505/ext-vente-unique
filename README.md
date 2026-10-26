@@ -19,6 +19,10 @@ Le bouton ouvre une rédaction Gmail mais ne l'envoie jamais automatiquement.
 
 Depuis le popup, le bouton « Récupérer les infos de la page » lit l'onglet actif et récupère le nom, le prénom, le compte modèle indiqué après « Reproduire depuis compte » et les adresses email visibles. Ces informations préremplissent le popup et le compte modèle est ajouté au brouillon Gmail avec l'identifiant préparé.
 
+## Filtres des tâches Lucca
+
+Sur `vente-unique.ilucca.net/workflow-automation/task-manager/tasks`, `task-filter.js` ajoute à la barre de filtres deux listes : **Type** (Onboarding, Offboarding…) et **Échéance** (en retard, aujourd'hui, 7 / 30 prochains jours, 30 jours ou plus). Le choix est mémorisé dans le navigateur.
+
 ## Tests
 
 Le brouillon d'arrivée (`arrival-draft.js`) contient les règles du popup : calcul de l'identifiant, génération des mots de passe, enregistrement du brouillon et des destinataires. Il se teste sans navigateur, avec Node 20 ou plus :
