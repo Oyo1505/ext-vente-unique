@@ -27,10 +27,11 @@ globalThis.ONBOARDING_CONFIG = {
     password: "azerty"
   },
   password: {
-    // Format : une majuscule, des minuscules puis des chiffres, ex. Kmprtxzq4827
-    letters: 8,
-    digits: 4,
-    // Ajoute un symbole à la fin si un service l'exige
+    // Minuscules mélangées avec 1 à 4 majuscules et 1 à 4 chiffres, ex. kM7rtXz4qp8b
+    length: 12,
+    maxUppercase: 4,
+    maxDigits: 4,
+    // Ajoute un symbole si un service l'exige
     symbols: false
   }
 };

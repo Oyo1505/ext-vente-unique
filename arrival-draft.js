@@ -37,13 +37,26 @@ function createArrivalDraft({ config, storage, randomIndex = cryptoRandomIndex }
     return firstName && lastName ? `${firstName[0]}${config.login.separator}${lastName}` : "";
   }
 
-  // Majuscule, minuscules puis chiffres (ex. Kmprtxzq4827) : pas d'alternance de casse à la saisie
+  // Surtout des minuscules, avec 1 à maxUppercase majuscules et 1 à maxDigits chiffres, mélangés
   function generatePassword() {
-    const { letters, digits, symbols } = config.password;
-    let password = randomCharacter(UPPERCASE);
-    for (let index = 1; index < letters; index += 1) password += randomCharacter(LOWERCASE);
-    for (let index = 0; index < digits; index += 1) password += randomCharacter(DIGITS);
-    return password + (symbols ? randomCharacter(SYMBOLS) : "");
+    const { length, maxUppercase, maxDigits, symbols } = config.password;
+    const characters = [
+      ...randomCharacters(UPPERCASE, 1 + randomIndex(maxUppercase)),
+      ...randomCharacters(DIGITS, 1 + randomIndex(maxDigits)),
+      ...randomCharacters(SYMBOLS, symbols ? 1 : 0)
+    ];
+    characters.push(...randomCharacters(LOWERCASE, length - characters.length));
+
+    for (let index = characters.length - 1; index > 0; index -= 1) {
+      const swapIndex = randomIndex(index + 1);
+      [characters[index], characters[swapIndex]] = [characters[swapIndex], characters[index]];
+    }
+
+    return characters.join("");
+  }
+
+  function randomCharacters(alphabet, count) {
+    return Array.from({ length: count }, () => randomCharacter(alphabet));
   }
 
   function randomCharacter(alphabet) {

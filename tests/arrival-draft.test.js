@@ -4,7 +4,7 @@ require("../config.js");
 const { createArrivalDraft } = require("../arrival-draft.js");
 
 const baseConfig = globalThis.ONBOARDING_CONFIG;
-const PASSWORD_LENGTH = baseConfig.password.letters + baseConfig.password.digits;
+const PASSWORD_LENGTH = baseConfig.password.length;
 
 function memoryStorage({ draft, recipients } = {}) {
   const store = { draft, recipients };
@@ -89,17 +89,24 @@ test("les destinataires de la page remplacent ceux saisis, sauf s'il n'y en a pa
   assert.equal(draft.applyPageInfo({ ...page, recipientEmails: ["rh@exemple.com"] }).recipients, "rh@exemple.com");
 });
 
-test("les mots de passe suivent le format majuscule, minuscules puis chiffres", async () => {
+test("les mots de passe ont 1 à 4 majuscules et 1 à 4 chiffres, le reste en minuscules", async () => {
   const { draft } = await newDraft();
   for (let run = 0; run < 50; run += 1) {
     const password = draft.regenerate("windows").windowsPassword;
-    assert.match(password, /^[A-HJ-NP-Z][a-km-z]{7}[2-9]{4}$/);
+    const uppercase = password.replace(/[^A-Z]/g, "").length;
+    const digits = password.replace(/\D/g, "").length;
+    assert.equal(password.length, PASSWORD_LENGTH);
+    assert.match(password, /^[a-zA-Z2-9]+$/);
+    assert.ok(uppercase >= 1 && uppercase <= 4, `${password} : ${uppercase} majuscules`);
+    assert.ok(digits >= 1 && digits <= 4, `${password} : ${digits} chiffres`);
   }
 });
 
-test("l'option symbols ajoute un symbole final", async () => {
+test("l'option symbols ajoute un symbole", async () => {
   const { draft } = await newDraft({ config: withConfig({ password: { symbols: true } }) });
-  assert.match(draft.regenerate("windows").windowsPassword, /^[A-Za-z]{8}\d{4}[!@#$%&*\-_=+?]$/);
+  const password = draft.regenerate("windows").windowsPassword;
+  assert.equal(password.length, PASSWORD_LENGTH);
+  assert.equal(password.replace(/[^!@#$%&*\-_=+?]/g, "").length, 1);
 });
 
 test("chaque modification est enregistrée dans le brouillon, destinataires compris", async () => {
